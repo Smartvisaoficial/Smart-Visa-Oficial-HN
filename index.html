@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Smart Visa </title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- SwiperJS CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+       body {
+    
+            background-image: url(Chicago\ 2.png);
+             background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+             margin: 0;
+            overflow-x: hidden;
+               
+        }
+
+        .banner-header {
+            background-color: #1A4DA1;
+            border-bottom: 4px solid #e20707;
+            box-shadow: 0 4px 20px rgba(233, 229, 229, 0.973);
+            position: relative;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            position: relative;
+            overflow: hidden;
+            background: rgba(31, 159, 209, 0.76);
+            border: 2px solid rgba(15, 46, 187, 0.685);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+        }
+
+        .nav-btn:hover, .nav-btn.active-tab {
+            background: #280cc9;
+            border-color: #f71130;
+            color: #ffffffc9;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(121, 120, 120, 0.801);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(145, 37, 37, 0.836);
+            box-shadow: 0 8px 20px rgba(95, 95, 91, 0.89);
+        }
+
+        .glass-card-active {
+            background: rgba(184, 29, 29, 0.25);
+            border-color: #e63946;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+        }
+
+        /* TRANSICIÓN DE PERSIANAS 3D */
+        #perspective-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999;
+            pointer-events: none;
+            display: flex;
+            perspective: 1000px;
+        }
+
+        .slice-bar {
+            flex: 1;
+            height: 100%;
+            background: linear-gradient(180deg, #3665af 0%, #0e2c6d 100%);
+            border-right: 1px solid rgba(243, 223, 38, 0.815);
+            box-shadow: 0 0 15px rgba(224, 221, 221, 0.5);
+            transform-origin: top center;
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.5s ease;
+        }
+
+        body.page-loaded .slice-bar {
+            transform: rotateX(90deg) scaleY(0);
+            opacity: 0;
+            transition-delay: calc(var(--delay) * 0.05s);
+        }
+
+        body.page-exiting .slice-bar {
+            transform: rotateX(0deg) scaleY(1);
+            opacity: 1;
+            transition-delay: calc(var(--delay) * 0.04s);
+        }
+
+        #canvas-container {
+            width: 90%;
+            height: calc(100vh - 100px);
+            position: relative;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .modal-animate-enter {
+            animation: modalPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .card-dynamic {
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card-dynamic:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-spin {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .card-dynamic:hover .icon-spin {
+            transform: rotateY(180deg) scale(1.15);
+        }
+
+        /* ESTILOS DE TARJETAS PASOS */
+        .pasos-section { background-color: #0b2942; color: white; padding: 80px 20px; text-align: center; overflow: hidden; }
+        .pasos-section h2 { font-size: 34px; font-weight: 800; margin-bottom: 10px; color: #dd454c; }
+        .pasos-section p.subtitulo { color: #f4f5f7; font-size: 15px; margin-bottom: 50px; }
+        .pasos-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; max-width: 1100px; margin: 0 auto; perspective: 1000px; }
+        .flip-card { background-color: transparent; width: 240px; height: 280px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 16px; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+        .flip-card-front { background: linear-gradient(145deg, #162447, #0f1a35); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .flip-card-front .numero-badge { background: #ca1322; color: #ffffff; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(230, 57, 70, 0.5); }
+        .flip-card-front h3 { font-size: 20px; color: #ffffff; margin-bottom: 12px; }
+        .flip-card-front .indicador { font-size: 12px; color: #ffffff; margin-top: auto; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .flip-card-back { background: linear-gradient(145deg, #072049, #0b1a3a); color: #ffffff; transform: rotateY(180deg); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .flip-card-back .icono-atras { font-size: 38px; margin-bottom: 15px; color: #ffffff; }
+        .flip-card-back h4 { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #ffffff; }
+        .flip-card-back p { font-size: 13.5px; line-height: 1.5; color: #f0e8e2; font-weight: 500; }
+
+        .flag-img {
+            width: 36px;
+            height: 26px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .floating-review-card {
+            background: linear-gradient(135deg, rgba(26, 77, 161, 0.4) 0%, rgba(11, 26, 58, 0.8) 100%);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(230, 57, 70, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .floating-review-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #e21866;
+            box-shadow: 0 20px 40px rgba(238, 236, 236, 0.692);
+        }
+
+        .social-icon-flip { display: inline-block; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .social-icon-btn.loading .social-icon-flip { animation: flipIcon 0.8s ease-in-out infinite; color: #2fe717 !important; }
+
+        @keyframes flipIcon {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* CARRUSEL SWIPER EN SERVICIOS */
+        .swiper { width: 100%; padding-top: 20px; padding-bottom: 40px; }
+        .swiper-slide {
+            width: 310px; background: rgb(238, 234, 234);
+            backdrop-filter: blur(12px); border: 1px solid rgba(236, 184, 13, 0.87);
+            border-radius: 16px; text-align: center; color: rgb(243, 238, 238); transition-timing-function: linear !important;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            background-color: #e04545; color: rgb(250, 248, 248) !important;
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid rgb(241, 235, 235);
+            box-shadow: 0 4px 12px rgb(15, 111, 117);
+        }
+        .swiper-button-next::after, .swiper-button-prev::after { font-size: 18px !important; font-weight: bold; }
+
+        .hover-flip-icon { display: inline-block; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .group:hover .hover-flip-icon { transform: rotateY(360deg); color: #e63946 !important; }
+
+        .glow-card {
+            background: linear-gradient(135deg, rgba(235, 231, 231, 0.822) 0%, rgba(26, 77, 161, 0.3) 100%);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 50px rgba(211, 16, 32, 0.5), 0 0 30px rgba(230, 57, 70, 0.25);
+        }
+
+        .star-glow { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease; }
+        .star-glow:hover, .star-glow.active-star { transform: scale(1.3) rotate(-5deg); filter: drop-shadow(0 0 8px rgba(230, 57, 70, 0.8)); }
+
+        .input-focus-effect { transition: all 0.3s ease; }
+        .input-focus-effect:focus-within { border-color: #8b8b8b; box-shadow: 0 0 20px rgba(221, 12, 29, 0.4); transform: translateY(-2deg); }
+    
+    
+    </style>
+    </head>
+    <body class="min-h-screen flex flex-col">
+
+        <div id="perspective-transition-overlay"></div>
+
+        <!-- BANNER SUPERIOR UNIFICADO -->
+    <header class="banner-header w-full px-8 py-3 flex flex-row justify-between items-center sticky top-0 h-24">
+        <div class="flex items-center h-full">
+            <a onclick="switchPage('inicio')" class="cursor-pointer">
+                <img id="logo.png" src="Logo Smart Visa.png" alt="SMART VISA" class="h-20 w-auto object-contain hover:scale-105 transition-transform duration-200" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x80/1A4DA1/FFFFFF?text=SMART+VISA';">
+            </a>
+        </div>
+
+        <nav class="flex items-center gap-3">
+            <button onclick="switchPage('inicio')" id="btn-tab-inicio" class="nav-btn active-tab px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-house"></i> INICIO
+            </button>
+            <button onclick="switchPage('servicios')" id="btn-tab-servicios" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-passport"></i> NUESTROS SERVICIOS
+            </button>
+            <button onclick="switchPage('nosotros')" id="btn-tab-nosotros" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-users"></i> SOBRE NOSOTROS
+            </button>
+            <button onclick="switchPage('contactanos')" id="btn-tab-contactanos" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-envelope"></i> CONTACTANOS
+            </button>
+            <button onclick="switchPage('evaluacion')" id="btn-tab-evaluacion" class="nav-btn px-5 py-2.5 rounded-full text-white font-bold text-sm tracking-wide flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-clipboard-check"></i> FORM DE EVALUACIÓN
+            </button>
+        </nav>
+    </header>
+
+    <!-- ================= 1. PÁGINA INICIO ================= -->
+    <div id="page-inicio" class="page-content">
+        <section class="w-full max-w-6xl mx-auto px-4 py-12">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-orange-500 tracking-wide">
+                    Expertos en Trámites Consulares
+                </h1>
+                <p class="text-sm md:text-base text-white mt-4 max-w-2xl mx-auto leading-relaxed">
+                    Gestionamos tu solicitud de visa de forma ágil y transparente.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-clock text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-2">Trámites Ágiles</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Maximizamos la velocidad de agenda y llenado de solicitudes oficiales.
+                    </p>
+                </div>
+
+                 <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-file-signature text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-2">Simulacro Consular</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Práctica de entrevista real previa para tu cita oficial ante la embajada.
+                    </p>
+                </div>
+
+                <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-white/40">
+                    <div class="icon-spin w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                        <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Garantía y Confianza</h3>
+                    <p class="text-x text-white leading-relaxed">
+                        Protección estricta de tus datos confidenciales durante todo el proceso.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <main class="flex-grow flex flex-col lg:flex-row relative overflow-hidden my-8">
+            <div class="w-full lg:w-1/3 p-6 z-20 flex flex-col justify-between max-h-[90vh] overflow-y-auto">
+                <div>
+                    <h1 class="text-3xl text-white font-extrabold text-white drop-shadow-md">
+                        ¿Cuál será tu próximo viaje?
+                    <br>
+                </br>
+                    <div class="space-y-2" id="country-list"></div>
+                </div>
+                
+            </div>
+
+            <div class="w-full lg:w-2/3 h-[100px] lg:h-auto relative flex-grow" id="canvas-container">
+                <div id="country-modal" class="hidden absolute bottom-6 right-6 left-6 lg:left-auto lg:w-96 glass-card rounded-2xl p-5 shadow-2xl border border-white/30 z-30 overflow-hidden">
+                    <button onclick="closeModal()" class="absolute top-3 right-3 bg-black/40 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm z-10 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="relative h-44 rounded-xl overflow-hidden mb-4 border border-white/20 shadow-md">
+                        <img id="modal-img" src="" alt="Lugar Turístico" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
+                            <p id="modal-tourist-spot" class="text-xs font-bold text-white drop-shadow"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-1 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+                            <img id="modal-flag" src="" class="flag-img" alt="Bandera">
+                        </div>
+                        <div>
+                            <h3 id="modal-title" class="text-xl font-bold text-bla leading-tight">México</h3>
+                            <p id="modal-capital" class="text-xs text-red-500 font-semibold">Capital: Ciudad de México</p>
+                        </div>
+                    </div>
+                    <p id="modal-desc" class="text-xs text-blue-100 mb-4 line-clamp-2">
+                        Asesoría completa para trámite de visa de turismo y negocios.
+                    </p>
+                    <div class="flex gap-2">
+                        <button onclick="switchPage('servicios')" class="flex-1 bg-white/20 hover:bg-white/30 text-black font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-white/30">
+                            <i class="fa-solid fa-circle-info text-black"></i> Leer más
+                        </button>
+                        <button onclick="solicitarVisa()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-lg transition">
+                            ¡Tramitar Visa!
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section class="pasos-section my-8">
+            <h2>Tu Proceso en 4 Sencillos Pasos</h2>
+            <p class="subtitulo">Pasa el cursor sobre cada tarjeta para ver la información detallada</p>
+
+            <div class="pasos-container">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">1</div>
+                            <h3>Elige tu Destino</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-earth-americas icono-atras"></i>
+                            <h4>1. Selección</h4>
+                            <p>Selecciona entre Estados Unidos, Canadá, México, China o Reino Unido para iniciar tu expediente personalizado.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">2</div>
+                            <h3>Asesoría Inicial</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-clipboard-check icono-atras"></i>
+                            <h4>2. Diagnóstico</h4>
+                            <p>Evaluamos tu perfil financiero y laboral para maximizar tus posibilidades de aprobación antes de presentar la solicitud.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">3</div>
+                            <h3>Gestión y Cita</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-calendar-days icono-atras"></i>
+                            <h4>3. Trámite Oficial</h4>
+                            <p>Nos encargamos del llenado técnico del formulario (DS-160, etc.) y programamos tu cita consular oficial.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="numero-badge">4</div>
+                            <h3>¡Viaja Seguro!</h3>
+                            <span class="indicador">Girar <i class="fa-solid fa-rotate-right ml-1 text-white"></i></span>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fa-solid fa-plane-departure icono-atras"></i>
+                            <h4>4. Simulacro y Visa</h4>
+                            <p>Te preparamos con un simulacro de entrevista consular. Apruebas tu visa y ¡listo para despegar!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-[#0b1a3a] border-t border-b border-white/10 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-12">
+                    <span class="bg-red-600 text-white border border-red-500 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        <i class="fa-solid fa-comments text-white mr-1"></i> Opiniones de Clientes
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide">
+                        Experiencias y Comentarios
+                    </h2>
+                    <p class="mt-3 text-sm md:text-base text-blue-200 max-w-xl mx-auto">
+                        Comentarios reales de usuarios que han tramitado su visa con Smart Visa.
+                    </p>
+                </div>
+
+                <div id="reviews-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+</div>
+
+    <!-- ================= 2. PÁGINA SERVICIOS ================= -->
+    <div id="page-servicios" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full">
+            <section class="mb-16">
+                <div class="text-center mb-6">
+                    <span class="bg-red-600 text-white border border-red-500 text-1x1 font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        Elige tu próxima meta
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white uppercase">Visas Disponibles</h2>
+                    <p class="text-blue-200 text-sm mt-2">Nuestros principales destinos con asesoría consular garantizada (Turismo & Estudiante).</p>
+                </div>
+
+                <div class="swiper miCarrusel">
+                    <div class="swiper-wrapper">
+                        <!-- EE. UU. -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-red-500">
+                            <div class="text-5xl mb-3">🇺🇸</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Estados Unidos</h3>
+                            <p class="text-1x1 text-red-700 mb-4 font-semibold">Turismo, Negocios & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Correo Electronico Activo.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pago De Tasa Consular.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral y Extractos Bancarios.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa EE. UU.')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- MÉXICO -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-green-500">
+                            <div class="text-5xl mb-3">🇲🇽</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Méxicana</h3>
+                            <p class="text-1x1 text-green-700 mb-4 font-semibold">Turismo, Negocios & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaport Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Fotografia Tamaño Carnet.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Formulario De Solucitud.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa México')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- CANADÁ -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-red-500">
+                            <div class="text-5xl mb-3">🇨🇦</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Canadiense</h3>
+                            <p class="text-1x1 text-red-700 mb-4 font-semibold">Visitor Visa & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Carta con proposito de viaje.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pago de Tasa Consular y Biometricos.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa Canadá')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- REINO UNIDO -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-blue-500">
+                            <div class="text-5xl mb-3">🇬🇧</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa Reino Unido</h3>
+                            <p class="text-1x1 text-blue-700 mb-4 font-semibold">Standard Visitor & Estudios</p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Examen De Tuberculosis.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Carta De Invitacion (Si Aplica).</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa Reino Unido')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+
+                        <!-- CHINA -->
+                        <div class="swiper-slide p-6 border-t-4 border-t-yellow-500">
+                            <div class="text-5xl mb-3">🇨🇳</div>
+                            <h3 class="text-xl text-black font-black mb-1">Visa China</h3>
+                            <p class="text-1x1 text-yellow-700 mb-4 font-semibold">Turismo L / Comercial M </p>
+                            <ul class="text-1x1 text-black text-left space-y-2 mb-6">
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Pasaporte Vigente.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Fotografia Digital y Fisica.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Constancia Laboral Y Bancaria.</li>
+                                <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Comprobante De Cita.</li>
+                            </ul>
+                            <button onclick="solicitarServicio('Visa China')" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-1x1 tex-white transition shadow-lg">Aplicar Ahora</button>
+                        </div>
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </section>
+
+            <section>
+                <div class="text-center mb-10">
+                    <span class="bg-blue-900 text-white font-extrabold text-4xl px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                        <h1><i class=" text-white mr-1"></i> OTROS TRÁMITES MIGRATORIOS</h1>
+                        </span>
+                    <p class="text-white font-semibold text-sm mt-2">Soluciones integrales para residentes, empresas y viajeros.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-rotate"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-red-700">Renovación de Visas</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Renovación de visas para EE. UU., Canadá, Reino Unido y China. 
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Servicio de Fotografía</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Toma y edición de fotografías cumpliendo con las medidas, iluminación, fondo y parámetros biométricos exigidos por las embajadas.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-passport"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-red-700">Pasaportes EE. UU. y España</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Gestión de citas y documentación para renovación y primera vez de pasaportes americanos y españoles.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-id-card"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Residencias de EE. UU.</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Asesoría y procesamiento de residencia permanente (Green Card).
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-red-500 hover:border-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-red-600 border border-red-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-red-700">Empresas LLC en EE. UU.</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Apertura, registro y legalización de empresas LLC en Estados Unidos.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl hover:scale-[1.02] transition border border-blue-500 hover:border-blue-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-center text-white text-2xl">
+                                <i class="fa-solid fa-plane-up"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-700">Otros Trámites y Viajes</h3>
+                            </div>
+                        </div>
+                        <p class="text-1x1 font-semibold text-white mb-4 leading-relaxed">
+                            Solicitud de FOIA, evaluación de perdones migratorios, emisión de tickets aéreos y paquetes turísticos locales e internacionales.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 3. PÁGINA NOSOTROS ================= -->
+    <div id="page-nosotros" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full space-y-16">
+            <section class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-red-600 text-white border border-red-500 text-2xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block">
+                    Conoce a Nuestro Equipo
+                </span>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide"></h1>
+                <p class="text-sm md:text-base text-blue-100 leading-relaxed">
+                    En <strong class="text-white">Smart Visa</strong> te ofrecemos la mejor y mas Profesional asesoría personalizada para que tu proceso sea mas limpio y seguro
+                </p>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-red-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-red-600 border border-red-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-red-700 mb-2">Nuestra Misión</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                        Ser la agencia de consultoría y asesoría de visas líder en el mercado, brindando un servicio personalizado, profesional y tecnológicamente avanzado que garantice la máxima satisfacción de nuestros clientes, el bienestar de nuestro equipo y el liderazgo de la organización
+                    </p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-blue-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-blue-600 border border-blue-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-blue-900 mb-2">Nuestra Visión</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                        Ser la agencia de consultoría migratoria capaz de proponer las mejores estrategias de elegibilidad para cada cliente, empoderándolos para ser perfilados como aptos y cumpliendo sus objetivos. 
+                    </p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl text-center border-t-4 border-t-red-500 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-red-600 border border-red-500 flex items-center justify-center mb-4 text-white text-2xl">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-red-700 mb-2">Nuestros Valores</h3>
+                    <p class="text-1x1 font-semibold text-white leading-relaxed">
+                    Ética, transparencia, innovación, desarrollo constante de nuestro equipo y máxima calidad en nuestro trabajo para superar con éxito cualquier reto del entorno.
+                    </p>
+                </div>
+            </section>
+
+            <section class="relative bg-gradient-to-r from-slate-900 via-[#1A4DA1]/40 to-slate-900 border-2 border-red-500/60 rounded-3xl p-8 md:p-12 shadow-[0_0_30px_rgba(230,57,70,0.25)] overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-red-500 text-9xl pointer-events-none">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+                    <div class="relative group">
+                        <div class="w-48 h-48 md:w-56 md:h-56 rounded-full p-1.5 bg-gradient-to-tr from-red-600 via-blue-600 to-white shadow-2xl">
+                            <img src="FOTO JESSICA.png" alt="Directora Smart Visa" class="w-full h-full object-cover rounded-full border-4 border-slate-900 group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://via.placeholder.com/200/0b1a3a/FFFFFF?text=JESSICA';">
+                        </div>
+                        <span class="absolute bottom-2 right-2 bg-red-600 text-white font-black text-[10px] uppercase px-3 py-1 rounded-full shadow-lg border border-white">
+                            <i class="fa-solid fa-star mr-1"></i> CEO & Fundadora
+                        </span>
+                    </div>
+
+                    <div class="flex-1 text-center md:text-left space-y-4">
+                        <div>
+                            <span class="text-red-300 text-xs font-bold tracking-widest uppercase">Dirección General</span>
+                            <h2 class="text-2xl md:text-4xl font-extrabold text-white mt-1">Lic. Jessica Martinez Morgan</h2>
+                            <p class="text-xs md:text-sm text-white font-medium">Master in U.S. immigration Law & procedural practice</p>
+                        </div>
+                        
+                        <p class="text-xs md:text-sm text-white leading-relaxed italic border-l-2 border-red-500/50 pl-4 py-1">
+                            "En Smart Visa entendemos que detrás de cada pasaporte hay una historia de esfuerzo, familia o crecimiento personal. Nuestro compromiso es acompañarte con transparencia absoluta para asegurar el éxito de tu viaje."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-8">
+                <div class="text-center">
+                    <span class="bg-blue-600 text-white border border-blue-500 text-2xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-2">
+                        Equipo Especializado
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-white">Nuestros Trabajadores Expertos</h2>
+                    <p class="text-xs md:text-sm text-white mt-1">Profesionales dedicados a la revisión, armado de expedientes y preparación de entrevistas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-red-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-red-500/50 shadow-[0_0_15px_rgba(230,57,70,0.3)]">
+                            <img src="FOTO DE KIMBERLY GUITY.jpg" alt="KIMBERLY MARTINEZ" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=KIMBERLY';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">KIMBERLY MARTINEZ</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Agente de servicio al cliente </p>
+                    </div>
+
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-blue-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            <img src="FOTO DE ALEJANDRO VALLECILLO.jpg" alt="JOSE VALLECILLO" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=JOSE';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">JOSE VALLECILLO</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Agente de servicio al cliente </p>
+                    </div>
+
+                    <div class="card-dynamic bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-xl hover:border-red-500/50">
+                        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-red-500/50 shadow-[0_0_15px_rgba(230,57,70,0.3)]">
+                            <img src="FOTO DE KARLA RODRIGUEZ.jpg" alt="KARLA ORDOÑEZ" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/0b1a3a/FFFFFF?text=KARLA';">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">KARLA ORDOÑEZ</h3>
+                        <p class="text-1x1 text-red-500 font-extrabold mb-3">Asistente Administrativa</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card p-8 rounded-3xl text-center space-y-6 border border-white/20">
+                <h2 class="text-3xl font-bold text-white">¿Por qué Elegir a Smart Visa?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-blue-100">
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-white text-lg">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Transparencia Total</h4>
+                        <p class="text-white text-1x1 font-bold">Evaluamos tu perfil de forma honesta para garantizar las mejores posibilidades reales.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-whitetext-lg">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Acompañamiento 24/7</h4>
+                        <p class="text-white text-1x1 font-bold">Resolvemos tus dudas en todo momento antes, durante y después de tu cita consular.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 mx-auto flex items-center justify-center text-whitetext-lg">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-red-700">Gestión Rápida</h4>
+                        <p class="text-white text-1x1 font-bold">Optimizamos los tiempos de agenda de citas y llenado de formularios de manera eficiente.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 4. PÁGINA CONTACTANOS ================= -->
+    <div id="page-contactanos" class="page-content hidden">
+        <main class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full my-auto">
+            <h2 class="text-3xl md:text-5xl text-white font-extrabold mb-8 text-center drop-shadow-md">Contáctanos</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- CUADRO 1: WHATSAPP -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-red-600 border border-red-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">WhatsApp Directo</h3>
+                            </div>
+                        </div>
+                        <p class="text-x1 text-blue-200 mb-6">Elige el número de tu preferencia para chatear con nuestros asesores:</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="https://wa.me/50431512768" target="_blank" class="group flex items-center justify-between bg-white/10 hover:bg-white/20 p-3.5 rounded-2xl border border-white/20 transition">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-brands fa-whatsapp text-xl text-white hover-flip-icon"></i>
+                                <span class="text-sm font-semibold text-white">+504 3151-2768</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white/60 group-hover:text-white transition"></i>
+                        </a>
+
+                        <a href="https://wa.me/50496328912" target="_blank" class="group flex items-center justify-between bg-white/10 hover:bg-white/20 p-3.5 rounded-2xl border border-white/20 transition">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-brands fa-whatsapp text-xl text-white hover-flip-icon"></i>
+                                <span class="text-sm font-semibold text-white">+504 9632-8912</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white/60 group-hover:text-white transition"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CUADRO 2: REDES SOCIALES -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-red-600 border border-red-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-share-nodes text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">Nuestras Redes</h3>
+                            </div>
+                        </div>
+                        <p class="text-x1 text-blue-200 mb-4">Síguenos en nuestras plataformas oficiales para avisos y novedades:</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="https://www.tiktok.com/@smartvisa_hn?_r=1&_t=ZS-99vdK8kKYWD" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-tiktok text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">TikTok</span>
+                        </a>
+
+                        <a href="https://www.instagram.com/smartvisahn?stkn=MXFzd3M2NzdpOHQ0MA==" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-instagram text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">Instagram</span>
+                        </a>
+
+                        <a href="https://www.facebook.com/share/19X1coSLPc/?mibextid=wwXIfr" target="_blank" class="group flex items-center gap-2.5 bg-white/10 hover:bg-white/20 p-3 rounded-2xl border border-white/20 transition">
+                            <i class="fa-brands fa-facebook-f text-lg text-white hover-flip-icon"></i>
+                            <span class="text-xs font-semibold text-white">Facebook</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CUADRO 3: UBICACIÓN -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col justify-between shadow-xl border border-white/20">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-blue-600 border border-blue-300 rounded-2xl flex items-center justify-center">
+                                <i class="fa-solid fa-building text-xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-white">Nuestra Oficina</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-600 border border-red-300 p-3 rounded-2xl mb-3 flex items-center gap-3">
+                            <i class="fa-solid fa-layer-group text-white text-xl"></i>
+                            <div>
+                                <span class="text-1x1 font-bold uppercase text-blue-400 block">Nuestra oficina</span>
+                                <strong class="text-sm text-white">Nivel 25 - Oficina Smart Visa</strong>
+                            </div>
+                        </div>
+
+                        <p class="text-1x1 text-white flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-red-400 mt-0.5"></i>
+                            <span>Avenida Principal, 13001 San Pedro Sula, Cortés</span>
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="w-full h-28 rounded-2xl overflow-hidden border border-white/20 shadow-inner">
+                            <iframe 
+                                class="w-full h-full border-0" 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.755228189873!2d-88.0437717!3d15.5367112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f665b1d41ab02df%3A0xe5d3fb2c00438995!2sNuevos%20Horizontes%20Business%20Center!5e0!3m2!1ses!2shn!4v1710000000000!5m2!1ses!2shn" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUADRO 4: FOTO ENTRADA -->
+                <div class="glass-card p-6 rounded-3xl md:col-span-2 lg:col-span-3 flex flex-col md:flex-row items-center gap-6 shadow-xl border border-white/20">
+                    <div class="w-full md:w-1/2 h-52 rounded-2xl overflow-hidden border border-white/20 shadow-md relative group">
+                        <img src="OFICINA.png"  alt="Entrada Oficina Smart Visa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://via.placeholder.com/600x300/0b1a3a/FFFFFF?text=OFICINA+SMART+VISA';">
+                        <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-white font-semibold">
+                            <i class="fa-solid fa-door-open text-red-700 mr-1"></i> Entrada Principal - Nivel 25
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-1/2 space-y-3 text-center md:text-left">
+                        <span class="bg-red-600 text-white text-1x1 font-bold px-3 py-1 rounded-full border border-yellow-500 inline-block">Visítanos</span>
+                        <h3 class="text-2xl font-bold text-white">Instalados en el Nivel 25</h3>
+                        <p class="text-1x1 text-white leading-relaxed">
+                            Te esperamos en nuestras instalacion en el <strong> Nivel 25</strong>. Contamos con sala privada de asesoría y un equipo listo para guiarte en cada paso de tu trámite.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-2 justify-center md:justify-start">
+                            <strong><span class="text-[15px] bg-blue-200 px-3 py-1.5 rounded-xl border border-red-200"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Lun - Vie: 8:00 AM - 5:00 PM</span></strong>
+                            <strong><span class="text-[15px] bg-blue-200 px-3 py-1.5 rounded-xl border border-red-200"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> Sábados: 8:00 AM - 12:00 PM</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- FORMULARIO RESEÑAS -->
+        <section class="w-full max-w-4xl mx-auto my-12 px-4">
+            <div class="glow-card p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-600 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="text-center mb-8 relative z-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-600 border-2 border-red-300 rounded-2xl mb-4 animate-bounce">
+                        <i class="fa-solid fa-user-secret text-3xl text-white"></i>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide uppercase">
+                        ¡Tu Opinión Anónima Importa!
+                    </h2>
+                </div>
+
+                <form id="review-form" class="space-y-6 relative z-10">
+                    <div class="bg-white/5 border border-white/15 p-6 rounded-2xl text-center space-y-3">
+                        <label class="block text-sm font-bold tracking-wider text-white uppercase">
+                            ¿Cuántas estrellas le das a Smart Visa?
+                        </label>
+                        <div class="flex justify-center items-center gap-3 text-3xl md:text-5xl text-gray-600 cursor-pointer py-2 select-none" id="star-rating">
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="1"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="2"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="3"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="4"></i>
+                            <i class="fa-solid fa-star star-btn star-glow text-yellow-400 active-star" data-value="5"></i>
+                        </div>
+                        <span id="rating-text" class="text-1x1 font-extrabold text-red-600 tracking-widest uppercase block">¡Excelente Servicio! (5/5)</span>
+                        <input type="hidden" id="rating-value" value="5">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-1x1 font-bold uppercase tracking-wider text-white">
+                            <i class="fa-solid fa-comment-dots text-red-600 mr-1"></i> Cuéntanos tu experiencia (Anónimo)
+                        </label>
+                        <div class="input-focus-effect bg-black/30 border border-blue-400 rounded-2xl p-4">
+                            <textarea id="client-comment" placeholder="Escribe aquí tu testimonio o comentario anónimo..." class="w-full bg-transparent text-white text-white focus:outline-none placeholder-white h-32 resize-none" required></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 via-red-500 to-blue-700 hover:from-red-500 hover:to-blue-600 text-white font-extrabold text-lg py-5 rounded-2xl transition duration-300 transform hover:scale-[1.02] shadow-2xl flex items-center justify-center gap-3 tracking-wider uppercase">
+                        <i class="fa-solid fa-paper-plane text-xl"></i>
+                        Publicar mi Opinión Anónima en Inicio
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- PREGUNTAS FRECUENTES -->
+        <section class="w-full max-w-4xl mx-auto my-16 px-4">
+            <div class="text-center mb-8">
+                <span class="bg-blue-600 text-white border border-blue-300 text-xl font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-3">
+                    <i class="fa-solid fa-circle-question mr-1"></i> Aclara tus dudas
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-wide uppercase">
+                    Preguntas Frecuentes
+                </h2>
+                <p class="text-1x1 text-white mt-2 font-medium">
+                    Resuelve tus inquietudes más comunes sobre el proceso de visado.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Cuánto tiempo tarda el trámite de la visa?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        El tiempo varía según la disponibilidad de citas de la embajada. Nosotros nos encargamos de agilizar el llenado de formularios y monitorear fechas para programar tu cita lo más pronto posible.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Qué requisitos necesito para iniciar mi solicitud?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        Principalmente necesitas tu pasaporte vigente. Dependiendo del tipo de visa (turismo, estudio, trabajo), te brindaremos una lista personalizada con los documentos de respaldo.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span>¿Es obligatorio tener el boleto aéreo comprado antes de solicitar la visa?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                    No. Las embajadas recomiendan no comprar boletos definitivos hasta contar con la visa aprobada. Nosotros podemos emitir reservas o itinerarios de viaje provisionales para la presentación de tu solicitud.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-white text-base md:text-lg flex justify-between items-center focus:outline-none">
+                        <span> ¿Puedo solicitar visa si soy independiente, emprendedor o no tengo trabajo formal?</span>
+                        <i class="fa-solid fa-chevron-down text-red-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-sm md:text-base text-white border-t border-white/10 pt-3">
+                        Sí. Se evalúan tus ingresos, propiedades, registros de negocio o vínculos con el país para demostrar estabilidad económica y lazo social.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER GENERAL -->
+    <footer id="footer-general" class="w-full bg-[#071126] border-t-2 border-white/20 py-10 px-8 text-white relative z-40 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col items-center md:items-start gap-4">
+                <h3 class="text-sm font-bold tracking-widest text-blue-300 uppercase">Síguenos en nuestras redes</h3>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <a href="https://www.tiktok.com/@smartvisa_hn?_r=1&_t=ZS-99vdK8kKYWD" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-tiktok text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">TikTok</span>
+                    </a>
+                    <a href="https://www.instagram.com/smartvisahn?stkn=MXFzd3M2NzdpOHQ0MA==" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-instagram text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">Instagram</span>
+                    </a>
+                    <a href="https://www.facebook.com/share/19X1coSLPc/?mibextid=wwXIfr" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-facebook-f text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">Facebook</span>
+                    </a>
+                    <a href="https://wa.me/message/EEMUGPMS6YQEN1" target="_blank" class="social-icon-btn flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-full transition group">
+                        <i class="fa-brands fa-whatsapp text-white text-lg social-icon-flip"></i>
+                        <span class="text-xs font-semibold text-white">WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón flotante de WhatsApp -->
+<a href="https://wa.me/50431512768?text=Hola,%20deseo%20información%20sobre%20sus%20servicios."
+   class="whatsapp-float"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Contactar por WhatsApp">
+
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="32" height="32"
+       viewBox="0 0 24 24"
+       fill="white">
+    <path d="M20.52 3.48A11.8 11.8 0 0 0 12.12 0C5.6 0 .3 5.3.3 11.82c0 2.08.55 4.1 1.6 5.88L.2 24l6.46-1.69a11.8 11.8 0 0 0 5.46 1.35h.01c6.52 0 11.82-5.3 11.82-11.82 0-3.16-1.23-6.12-3.43-8.36ZM12.13 21.65a9.8 9.8 0 0 1-4.99-1.37l-.36-.21-3.84 1.01 1.03-3.74-.24-.38a9.8 9.8 0 1 1 8.4 4.69Zm5.38-7.35c-.29-.15-1.71-.84-1.98-.93-.26-.1-.46-.15-.65.15-.2.29-.75.93-.92 1.12-.17.2-.34.22-.63.07-.29-.15-1.22-.45-2.32-1.43-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.3-.49.1-.19.05-.36-.03-.51-.07-.15-.65-1.57-.9-2.15-.24-.57-.48-.49-.65-.5h-.55c-.2 0-.51.07-.78.36-.27.29-1.02 1-1.02 2.43s1.05 2.82 1.2 3.02c.15.19 2.06 3.15 5 4.42.7.3 1.24.48 1.66.61.7.22 1.34.19 1.84.12.56-.08 1.71-.7 1.95-1.38.24-.68.24-1.27.17-1.39-.07-.12-.27-.19-.56-.34Z"/>
+  </svg>
+</a>
+
+<style>
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.12);
+    background-color: #1ebe5d;
+}
+</style>
+        
+    <!-- SWIPER JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- SCRIPT PRINCIPAL E INTERACTIVO -->
+    
+    <!-- ================= 5. PÁGINA FORMULARIO DE EVALUACIÓN ================= -->
+    <div id="page-evaluacion" class="page-content hidden">
+      <style>
+    #page-evaluacion {
+      --azul: #0750ad;
+      --azul-oscuro: #123c70;
+      --naranja: #f04418;
+      --fondo: #f2f5f9;
+      --texto: #263445;
+      --borde: #d4dce7;
+    }
+    #page-evaluacion * { box-sizing: border-box; }
+    #page-evaluacion {
+      margin: 0;
+      padding: 40px 16px;
+      background-image: linear-gradient(rgba(8, 29, 62, .48), rgba(8, 29, 62, .48)), url("Chicago 2.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #page-evaluacion .contenedor {
+      position: relative;
+      width: min(900px, 100%);
+      margin: 0 auto;
+      padding: 34px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(15, 43, 78, .12);
+    }
+    #page-evaluacion .logo {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      width: 112px;
+      height: 112px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    #page-evaluacion .encabezado {
+      min-height: 112px;
+      padding: 10px 130px 18px 0;
+      text-align: center;
+    }
+    #page-evaluacion .encabezado h1 {
+      margin: 8px 0 8px;
+      color: var(--azul-oscuro);
+      font-size: clamp(25px, 4vw, 34px);
+      letter-spacing: .5px;
+    }
+    #page-evaluacion .encabezado p { margin: 0; color: #667386; line-height: 1.5; }
+    #page-evaluacion .nota {
+      margin: 12px 0 24px;
+      padding: 12px 14px;
+      background: #eef5ff;
+      border-left: 4px solid var(--azul);
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    #page-evaluacion h2 {
+      margin: 30px 0 17px;
+      padding-bottom: 9px;
+      color: var(--azul-oscuro);
+      font-size: 18px;
+      border-bottom: 2px solid #e2eaf4;
+    }
+    #page-evaluacion .fila {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    #page-evaluacion .campo { margin-bottom: 16px; min-width: 0; }
+    #page-evaluacion label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    #page-evaluacion input, #page-evaluacion select, #page-evaluacion textarea {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--borde);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--texto);
+      font: inherit;
+      font-size: 14px;
+    }
+    #page-evaluacion input:focus, #page-evaluacion select:focus, #page-evaluacion textarea:focus {
+      outline: 2px solid rgba(7, 80, 173, .18);
+      border-color: var(--azul);
+    }
+    #page-evaluacion textarea { min-height: 90px; resize: vertical; }
+    #page-evaluacion .consentimiento {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 22px 0 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    #page-evaluacion .consentimiento input {
+      width: auto;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+    #page-evaluacion .privacidad {
+      color: #687587;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    #page-evaluacion button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--azul);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    #page-evaluacion button:hover { background: var(--azul-oscuro); }
+    #page-evaluacion .pie {
+      margin-top: 20px;
+      text-align: center;
+      color: #718096;
+      font-size: 12px;
+    }
+    /* Campo anti-spam: no modificar */
+    #page-evaluacion .campo-oculto { display: none !important; }
+    @media (max-width: 620px) {
+      #page-evaluacion { padding: 12px 8px; }
+      #page-evaluacion .contenedor { padding: 22px 17px; }
+      #page-evaluacion .logo {
+        position: static;
+        display: block;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 8px;
+      }
+      #page-evaluacion .encabezado { min-height: 0; padding: 0 0 12px; }
+      #page-evaluacion .fila { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+      <main class="contenedor">
+<!-- Logo oficial incorporado dentro del archivo HTML -->
+<img alt="Logo Smart Visa HN" class="logo" src="data:image/png;base64,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"/>
+<header class="encabezado">
+<h1>SMART VISA HN</h1>
+<p>Formulario de Registro y Perfil del Cliente</p>
+</header>
+<div class="nota">
+      Complete la información con datos correctos y actualizados. Los campos marcados como obligatorios
+      deben completarse para enviar el formulario.
+    </div>
+<!-- El formulario se envía al correo oficial mediante FormSubmit -->
+<form id="formulario-cliente-smartvisa" onsubmit="enviarPerfilWhatsApp(event)">
+
+
+
+<input autocomplete="off" class="campo-oculto" name="_honey" tabindex="-1" type="text"/>
+<h2>1. Datos personales</h2>
+<div class="campo">
+<label for="nombre">Nombre completo *</label>
+<input autocomplete="name" id="nombre" name="Nombre completo" required="" type="text"/>
+</div>
+<div class="fila">
+<div class="campo">
+<label for="edad">Edad</label>
+<input id="edad" max="120" min="1" name="Edad" type="number"/>
+</div>
+<div class="campo">
+<label for="estado_civil">Estado civil</label>
+<select id="estado_civil" name="Estado civil">
+<option value="">Seleccione</option>
+<option>Soltero(a)</option><option>Casado(a)</option>
+<option>Unión libre</option><option>Divorciado(a)</option><option>Viudo(a)</option>
+</select>
+</div>
+</div>
+<div class="fila">
+<div class="campo">
+<label for="telefono">Teléfono / WhatsApp *</label>
+<input autocomplete="tel" id="telefono" name="Teléfono / WhatsApp" required="" type="tel"/>
+</div>
+<div class="campo">
+<label for="correo">Correo electrónico</label>
+<input autocomplete="email" id="correo" name="Correo electrónico" type="email"/>
+</div>
+</div>
+<div class="campo">
+<label for="ciudad">Ciudad y país de residencia</label>
+<input id="ciudad" name="Ciudad y país de residencia" type="text"/>
+</div>
+<h2>2. Información laboral y económica</h2>
+<div class="fila">
+<div class="campo">
+<label for="profesion">Profesión u ocupación</label>
+<input id="profesion" name="Profesión u ocupación" type="text"/>
+</div>
+<div class="campo">
+<label for="empresa">Empresa o negocio</label>
+<input id="empresa" name="Empresa o negocio" type="text"/>
+</div>
+</div>
+<div class="fila">
+<div class="campo">
+<label for="cargo">Cargo que desempeña</label>
+<input id="cargo" name="Cargo" type="text"/>
+</div>
+<div class="campo">
+<label for="antiguedad">Antigüedad laboral</label>
+<input id="antiguedad" name="Antigüedad laboral" placeholder="Ej. 3 años" type="text"/>
+</div>
+</div>
+<div class="campo">
+<label for="ingresos">Ingreso mensual aproximado</label>
+<select id="ingresos" name="Ingreso mensual aproximado">
+<option value="">Seleccione</option>
+<option>Menos de L 10,000</option><option>L 10,000 - L 20,000</option>
+<option>L 20,001 - L 40,000</option><option>L 40,001 - L 60,000</option>
+<option>Más de L 60,000</option><option>Ingresos variables</option>
+<option>Prefiero indicarlo durante la asesoría</option>
+</select>
+</div>
+<h2>3. Perfil migratorio</h2>
+<div class="campo">
+<label for="tipo_visa">¿Qué tipo de visa desea solicitar? *</label>
+<select id="tipo_visa" name="Visa de interés" required="">
+<option value="">Seleccione</option>
+<option>Estados Unidos</option><option>Canadá</option>
+<option>Reino Unido</option><option>México</option>
+<option>China</option><option>Otra / No estoy seguro(a)</option>
+</select>
+</div>
+<div class="campo">
+<label for="viajes">¿Ha viajado anteriormente al extranjero?</label>
+<select id="viajes" name="Viajes internacionales anteriores">
+<option value="">Seleccione</option><option>Sí</option><option>No</option>
+</select>
+</div>
+<div class="campo">
+<label for="paises_visitados">Países que ha visitado (si aplica)</label>
+<textarea id="paises_visitados" name="Países visitados"></textarea>
+</div>
+<div class="campo">
+<label for="visa_anterior">¿Ha tenido alguna visa anteriormente?</label>
+<select id="visa_anterior" name="Visa anterior">
+<option value="">Seleccione</option>
+<option>Sí, actualmente vigente</option><option>Sí, vencida</option><option>No</option>
+</select>
+</div>
+<h2>4. Historial migratorio y familiar</h2>
+<div class="campo">
+<label for="negacion">¿Le han negado alguna visa anteriormente?</label>
+<select id="negacion" name="Negativa de visa">
+<option value="">Seleccione</option><option>Sí</option><option>No</option>
+</select>
+</div>
+<div class="campo">
+<label for="detalle_negativa">Si respondió sí, indique país, fecha y tipo de visa (no incluya información confidencial innecesaria)</label>
+<textarea id="detalle_negativa" name="Detalles de negativa"></textarea>
+</div>
+<div class="campo">
+<label for="familiares">¿Tiene familiares viviendo en el extranjero?</label>
+<select id="familiares" name="Familiares en el extranjero">
+<option value="">Seleccione</option><option>Sí</option><option>No</option>
+</select>
+</div>
+<div class="campo">
+<label for="detalle_familiares">Indique parentesco y país de residencia (si aplica)</label>
+<textarea id="detalle_familiares" name="Detalles de familiares en el extranjero"></textarea>
+</div>
+<h2>5. Información del viaje</h2>
+<div class="campo">
+<label for="motivo">Motivo principal del viaje</label>
+<select id="motivo" name="Motivo del viaje">
+<option value="">Seleccione</option><option>Turismo</option>
+<option>Visita familiar o amistades</option><option>Negocios</option>
+<option>Estudios</option><option>Otro</option>
+</select>
+</div>
+<div class="fila">
+<div class="campo">
+<label for="duracion">Duración estimada del viaje</label>
+<input id="duracion" name="Duración estimada" placeholder="Ej. 2 semanas" type="text"/>
+</div>
+<div class="campo">
+<label for="financiamiento">¿Quién financiará el viaje?</label>
+<select id="financiamiento" name="Financiamiento del viaje">
+<option value="">Seleccione</option><option>Yo mismo(a)</option>
+<option>Padres</option><option>Cónyuge</option><option>Familiar</option>
+<option>Empresa</option><option>Otro</option>
+</select>
+</div>
+</div>
+<div class="campo">
+<label for="observaciones">Información adicional que desea compartir</label>
+<textarea id="observaciones" name="Información adicional"></textarea>
+</div>
+<label class="consentimiento">
+<input name="Consentimiento" required="" type="checkbox" value="Aceptado"/>
+<span>Autorizo a Smart Visa HN a utilizar la información proporcionada para contactarme y brindarme asesoría sobre los servicios solicitados. *</span>
+</label>
+<p class="privacidad">
+        No incluya números de pasaporte, contraseñas, datos bancarios ni documentos sensibles en este formulario.
+        La información debe manejarse conforme a la política de privacidad de la empresa y con acceso restringido.
+      </p>
+<button type="submit">ENVIAR PERFIL POR WHATSAPP</button>
+</form>
+<div class="pie">Smart Visa HN · Conectando vidas</div>
+</main>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+        // CONFIGURACIÓN DE PÁGINAS DINÁMICAS
+        function switchPage(pageId) {
+            document.body.classList.remove('page-loaded');
+            document.body.classList.add('page-exiting');
+
+            setTimeout(() => {
+                document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+                // Ocultar el footer general mientras se muestra el formulario de evaluación.
+                const footerGeneral = document.getElementById('footer-general');
+                if (footerGeneral) footerGeneral.style.display = pageId === 'evaluacion' ? 'none' : '';
+
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
+                const activeBtn = document.getElementById(`btn-tab-${pageId}`);
+                if (activeBtn) activeBtn.classList.add('active-tab');
+
+                window.scrollTo(0, 0);
+
+                document.body.classList.remove('page-exiting');
+                document.body.classList.add('page-loaded');
+
+                if (pageId === 'servicios' && window.mySwiperInstance) {
+                    window.mySwiperInstance.update();
+                }
+            }, 500);
+        }
+
+        // DATOS MUNDO 3D
+        const COUNTRIES = [
+            { id: 'mexico', name: 'México', flagUrl: 'https://flagcdn.com/w80/mx.png', capital: 'Ciudad de México', lat: 23.6345, lng: -102.5528, desc: 'Descubre las pirámides, playas caribeñas y gastronomía mexicana.', touristSpot: '📍 Chichén Itzá, Yucatán', image: 'https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=800&q=80' },
+            { id: 'china', name: 'China', flagUrl: 'https://flagcdn.com/w80/cn.png', capital: 'Pekín', lat: 35.8617, lng: 104.1954, desc: 'Explora una de las culturas más antiguas del mundo y sus rascacielos.', touristSpot: '📍 La Gran Muralla China', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80' },
+            { id: 'canada', name: 'Canadá', flagUrl: 'https://flagcdn.com/w80/ca.png', capital: 'Ottawa', lat: 56.1304, lng: -106.3468, desc: 'Paisajes naturales deslumbrantes, montañas rocosas y ciudades modernas.', touristSpot: '📍 Cataratas del Niágara & CN Tower', image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=800&q=80' },
+            { id: 'usa', name: 'Estados Unidos', flagUrl: 'https://flagcdn.com/w80/us.png', capital: 'Washington D.C.', lat: 37.0902, lng: -95.7129, desc: 'El destino de negocios y turismo más icónico del continente.', touristSpot: '📍 Estatua de la Libertad, Nueva York', image: 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?auto=format&fit=crop&w=800&q=80' },
+            { id: 'uk', name: 'Reino Unido', flagUrl: 'https://flagcdn.com/w80/gb.png', capital: 'Londres', lat: 55.3781, lng: -3.4360, desc: 'Historia real, arquitectura clásica y universidades de prestigio mundial.', touristSpot: '📍 Big Ben & Palacio de Westminster', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80' }
+        ];
+
+        let selectedCountry = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // PERSIANAS OVERLAY
+            const overlay = document.getElementById('perspective-transition-overlay');
+            for (let i = 0; i < 10; i++) {
+                const bar = document.createElement('div');
+                bar.classList.add('slice-bar');
+                bar.style.setProperty('--delay', i);
+                overlay.appendChild(bar);
+            }
+            setTimeout(() => { document.body.classList.add('page-loaded'); }, 100);
+
+            // MUNDO 3D - LISTA DE PAÍSES
+            const countryListContainer = document.getElementById('country-list');
+            COUNTRIES.forEach(country => {
+                const btn = document.createElement('div');
+                btn.className = 'glass-card p-4 rounded-xl cursor-pointer hover:glass-card-active flex items-center justify-between transition group';
+                btn.id = `btn-${country.id}`;
+                btn.onclick = () => selectCountry(country);
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${country.flagUrl}" alt="${country.name}" class="flag-img">
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-red-300 transition">${country.name}</h4>
+                            <p class="text-xs text-blue-200">${country.capital}</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-white/50 group-hover:text-white transition"></i>
+                `;
+                countryListContainer.appendChild(btn);
+            });
+
+            // MUNDO 3D - THREE.JS
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.z = 240;
+
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+                const dirLight = new THREE.DirectionalLight(0x00d2ff, 0.8);
+                dirLight.position.set(5, 3, 5);
+                scene.add(dirLight);
+
+                const globeRadius = 80;
+                const textureLoader = new THREE.TextureLoader();
+                const worldTexture = textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg');
+
+                const globeMat = new THREE.MeshPhongMaterial({ map: worldTexture, color: 0x1d4ed8, shininess: 25 });
+                const globe = new THREE.Mesh(new THREE.SphereGeometry(globeRadius, 64, 64), globeMat);
+                scene.add(globe);
+
+                const gridGeo = new THREE.WireframeGeometry(new THREE.SphereGeometry(globeRadius + 0.5, 24, 24));
+                const gridMat = new THREE.LineBasicMaterial({ color: 0x00d2ff, transparent: true, opacity: 0.15 });
+                const gridMesh = new THREE.LineSegments(gridGeo, gridMat);
+                globe.add(gridMesh);
+
+                const markersGroup = new THREE.Group();
+                scene.add(markersGroup);
+
+                function latLngToVector3(lat, lng, radius) {
+                    const phi = (90 - lat) * (Math.PI / 180);
+                    const theta = (lng + 180) * (Math.PI / 180);
+                    return new THREE.Vector3(
+                        -(radius * Math.sin(phi) * Math.cos(theta)),
+                        radius * Math.cos(phi),
+                        radius * Math.sin(phi) * Math.sin(theta)
+                    );
+                }
+
+                COUNTRIES.forEach(c => {
+                    const pos = latLngToVector3(c.lat, c.lng, globeRadius + 1.2);
+                    const dotMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0033 }));
+                    dotMesh.position.copy(pos);
+                    const glowMesh = new THREE.Mesh(new THREE.SphereGeometry(3.8, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff0033, transparent: true, opacity: 0.4 }));
+                    glowMesh.position.copy(pos);
+                    markersGroup.add(dotMesh);
+                    markersGroup.add(glowMesh);
+                });
+
+                let isDragging = false, prevMousePos = { x: 0, y: 0 };
+                container.addEventListener('mousedown', (e) => { isDragging = true; prevMousePos = { x: e.clientX, y: e.clientY }; });
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const deltaX = e.clientX - prevMousePos.x;
+                    const deltaY = e.clientY - prevMousePos.y;
+                    globe.rotation.y += deltaX * 0.005;
+                    globe.rotation.x += deltaY * 0.005;
+                    markersGroup.rotation.y = globe.rotation.y;
+                    markersGroup.rotation.x = globe.rotation.x;
+                    prevMousePos = { x: e.clientX, y: e.clientY };
+                });
+                window.addEventListener('mouseup', () => isDragging = false);
+
+                window.selectCountry = function(country) {
+                    selectedCountry = country;
+                    document.querySelectorAll('#country-list > div').forEach(el => el.classList.remove('glass-card-active'));
+                    document.getElementById(`btn-${country.id}`).classList.add('glass-card-active');
+
+                    const modal = document.getElementById('country-modal');
+                    modal.classList.remove('hidden', 'modal-animate-enter');
+                    void modal.offsetWidth; 
+                    modal.classList.add('modal-animate-enter');
+
+                    document.getElementById('modal-img').src = country.image;
+                    document.getElementById('modal-tourist-spot').innerText = country.touristSpot;
+                    document.getElementById('modal-flag').src = country.flagUrl;
+                    document.getElementById('modal-title').innerText = country.name;
+                    document.getElementById('modal-capital').innerText = `Capital: ${country.capital}`;
+                    document.getElementById('modal-desc').innerText = country.desc;
+
+                    const targetLat = country.lat * (Math.PI / 180);
+                    const targetLng = -country.lng * (Math.PI / 180);
+
+                    let steps = 0;
+                    function animateToCountry() {
+                        if (steps < 30) {
+                            globe.rotation.y += (targetLng - globe.rotation.y) * 0.1;
+                            globe.rotation.x += (targetLat * 0.3 - globe.rotation.x) * 0.1;
+                            markersGroup.rotation.y = globe.rotation.y;
+                            markersGroup.rotation.x = globe.rotation.x;
+                            steps++;
+                            requestAnimationFrame(animateToCountry);
+                        }
+                    }
+                    animateToCountry();
+                };
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (!isDragging) {
+                        globe.rotation.y += 0.0015;
+                        markersGroup.rotation.y = globe.rotation.y;
+                    }
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                });
+            }
+
+            // CARGAR RESEÑAS
+            loadReviews();
+
+            // FORMULARIO DE RESEÑAS EN CONTACTANOS
+            const stars = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('rating-value');
+            const ratingText = document.getElementById('rating-text');
+            const reviewForm = document.getElementById('review-form');
+
+            const ratingLabels = {
+                1: "Deficiente (1/5)",
+                2: "Regular (2/5)",
+                3: "Bueno (3/5)",
+                4: "Muy Bueno (4/5)",
+                5: "¡Excelente Servicio! (5/5)"
+            };
+
+            if (stars.length) {
+                stars.forEach((star, index) => {
+                    star.addEventListener('click', () => {
+                        const val = index + 1;
+                        ratingInput.value = val;
+                        ratingText.textContent = ratingLabels[val];
+                        highlightStars(index);
+                    });
+                    star.addEventListener('mouseover', () => highlightStars(index));
+                    star.addEventListener('mouseleave', () => highlightStars(parseInt(ratingInput.value) - 1));
+                });
+            }
+
+            function highlightStars(index) {
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.classList.add('text-red-500', 'active-star');
+                        s.classList.remove('text-gray-500');
+                    } else {
+                        s.classList.add('text-gray-500');
+                        s.classList.remove('text-red-500', 'active-star');
+                    }
+                });
+            }
+
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newReview = {
+                        name: "Usuario Anónimo",
+                        visa: "Trámite de Visado",
+                        comment: document.getElementById('client-comment').value,
+                        stars: parseInt(ratingInput.value),
+                        date: "Hace un momento"
+                    };
+
+                    let reviews = JSON.parse(localStorage.getItem('smartvisa_reviews')) || [];
+                    reviews.unshift(newReview);
+                    localStorage.setItem('smartvisa_reviews', JSON.stringify(reviews));
+
+                    alert('¡Gracias! Tu opinión anónima ha sido registrada y publicada en nuestro Inicio.');
+                    document.getElementById('client-comment').value = '';
+                    loadReviews();
+                    switchPage('inicio');
+                });
+            }
+
+            // FAQ ACCORDION
+            const faqButtons = document.querySelectorAll('.faq-btn');
+            faqButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const answer = button.nextElementSibling;
+                    const icon = button.querySelector('i');
+                    answer.classList.toggle('hidden');
+                    icon.style.transform = answer.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+            });
+
+            // INICIALIZAR SWIPER EN SERVICIOS
+            window.mySwiperInstance = new Swiper(".miCarrusel", {
+                effect: "coverflow",
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: "auto",
+                initialSlide: 0,
+                loop: true,
+                autoplay: {
+                    delay: 2800,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                speed: 800,
+                coverflowEffect: {
+                    rotate: 20,
+                    stretch: 0,
+                    depth: 150,
+                    modifier: 1,
+                    slideShadows: false
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                }
+            });
+        });
+
+        function loadReviews() {
+            const defaultReviews = [
+                { rating: 5, text: "Mi experiencia fue satisfactoria y profesional, me asesoraron y aclararon muchas de mis dudas y se me instruyó muy bien sobre cómo responder adecuadamente.." },
+                { rating: 5, text: "La ayuda que me brindaron fue de calidad, siempre contestaron muy amablemente todas mis inquietudes y me guiaron en el proceso. Estoy muy feliz por que ahora cuento con mi visa.." },
+                { rating: 5, text: "100% recomendados! Fueron claros con los pasos a seguir, dan seguimiento y tienen paciencia para explicar todo! Muy satisfecha." },
+                { rating: 4, text: "Excelente atención, muy profesionales , muy satisfecha, muy claro todo , me encantó la preparación para la entrevista consular !." }
+            ];
+
+            const savedReviewsRaw = JSON.parse(localStorage.getItem('smartvisa_reviews')) || [];
+            const savedReviewsFormatted = savedReviewsRaw.map(r => ({
+                rating: Number(r.stars || r.rating) || 5,
+                text: r.comment || r.text || "Excelente atención y trámite."
+            }));
+
+            const combined = [...savedReviewsFormatted, ...defaultReviews];
+            const displayReviews = combined.slice(0, Math.max(4, savedReviewsFormatted.length));
+
+            const containerReviews = document.getElementById('reviews-container');
+            if (containerReviews) {
+                containerReviews.innerHTML = displayReviews.map(rev => `
+                    <div class="floating-review-card p-6 rounded-3xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-1 text-red-500 mb-3 text-lg">
+                                ${'<i class="fa-solid fa-star"></i>'.repeat(rev.rating)}
+                                ${'<i class="fa-regular fa-star text-white/30"></i>'.repeat(5 - rev.rating)}
+                            </div>
+                            <p class="text-blue-100 text-sm italic leading-relaxed">"${rev.text}"</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-wider">
+                                <i class="fa-solid fa-user-check mr-1"></i> Cliente Verificado
+                            </span>
+                            <i class="fa-solid fa-quote-right text-white/20 text-xl"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('country-modal').classList.add('hidden');
+        }
+
+        function solicitarVisa() {
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            const destino = selectedCountry ? selectedCountry.name : 'mi visa';
+            const mensaje = encodeURIComponent(`Hola, me gustaría solicitar más información para tramitar mi visa a ${destino}.`);
+            setTimeout(() => { window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank'); }, 500);
+        }
+
+        function irAWhatsApp(servicio = '') {
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            const textoMensaje = servicio 
+                ? `Hola, deseo solicitar información sobre el trámite de: ${servicio}` 
+                : `Hola, me gustaría solicitar más información sobre los trámites de visa.`;
+            const mensaje = encodeURIComponent(textoMensaje);
+            setTimeout(() => { window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank'); }, 500);
+        }
+
+        function solicitarServicio(servicio) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            setTimeout(() => {
+                const mensaje = encodeURIComponent(`Hola Smart Visa, deseo obtener más información sobre el servicio de: ${servicio}`);
+                window.open(`https://wa.me/message/EEMUGPMS6YQEN1?text=${mensaje}`, '_blank');
+            }, 500);
+        }
+    
+        // GENERA EL PERFIL EN PDF CON IDENTIDAD VISUAL DE SMART VISA HN
+        async function enviarPerfilWhatsApp(event) {
+            event.preventDefault();
+
+            const formulario = document.getElementById('formulario-cliente-smartvisa');
+            if (!formulario.checkValidity()) {
+                formulario.reportValidity();
+                return;
+            }
+            const honeypot = formulario.querySelector('[name="_honey"]');
+            if (honeypot && honeypot.value.trim() !== '') return;
+
+            const boton = formulario.querySelector('button[type="submit"]');
+            const textoOriginal = boton ? boton.textContent : '';
+            if (boton) {
+                boton.disabled = true;
+                boton.textContent = 'GENERANDO PDF...';
+            }
+
+            let areaPDF;
+            try {
+                if (typeof html2pdf === 'undefined') {
+                    throw new Error('No se pudo cargar el generador de PDF.');
+                }
+
+                // Clona el formulario original para conservar su estructura, logo,
+                // títulos, secciones, colores, bordes y distribución visual.
+                const paginaOriginal = document.querySelector('#page-evaluacion .contenedor');
+                areaPDF = document.createElement('div');
+                areaPDF.id = 'page-evaluacion';
+                areaPDF.style.cssText = `
+                    display:block !important; position:absolute; left:0; top:0;
+                    width:940px; padding:20px; margin:0; background:#ffffff;
+                    z-index:-1; opacity:1; pointer-events:none;
+                `;
+
+                const formularioClonado = paginaOriginal.cloneNode(true);
+                formularioClonado.style.cssText += ';display:block;width:900px;max-width:none;margin:0 auto;box-shadow:none;';
+                areaPDF.appendChild(formularioClonado);
+                document.body.appendChild(areaPDF);
+
+                const formPDF = formularioClonado.querySelector('#formulario-cliente-smartvisa');
+
+                // CLAVE: copiar los valores del formulario REAL al clon.
+                // cloneNode() no conserva de forma fiable los valores escritos,
+                // selecciones ni casillas marcadas por el cliente.
+                const controlesOriginales = formulario.querySelectorAll('input, select, textarea');
+                const controlesClonados = formPDF.querySelectorAll('input, select, textarea');
+
+                controlesOriginales.forEach((original, indice) => {
+                    const copia = controlesClonados[indice];
+                    if (!copia) return;
+
+                    if (original.type === 'checkbox' || original.type === 'radio') {
+                        copia.checked = original.checked;
+                    } else if (original.tagName === 'SELECT') {
+                        copia.selectedIndex = original.selectedIndex;
+                        Array.from(copia.options).forEach((opcion, i) => {
+                            opcion.selected = original.options[i]?.selected || false;
+                        });
+                    } else {
+                        copia.value = original.value;
+                        copia.setAttribute('value', original.value);
+                        if (original.tagName === 'TEXTAREA') copia.textContent = original.value;
+                    }
+                });
+
+                // Sustituye cada control por la respuesta del cliente, dentro del
+                // mismo espacio del campo, conservando etiquetas, secciones y diseño.
+                formPDF.querySelectorAll('input, select, textarea').forEach(control => {
+                    if (control.name === '_honey' || control.classList.contains('campo-oculto')) {
+                        control.remove();
+                        return;
+                    }
+
+                    if (control.type === 'checkbox') {
+                        const marca = document.createElement('span');
+                        marca.textContent = control.checked ? '☑' : '☐';
+                        marca.style.cssText = 'display:inline-block;font-size:17px;color:#0750ad;min-width:20px;';
+                        control.replaceWith(marca);
+                        return;
+                    }
+
+                    let respuesta = '';
+                    if (control.tagName === 'SELECT') {
+                        respuesta = control.selectedIndex >= 0
+                            ? control.options[control.selectedIndex].text.trim() : '';
+                        if (!respuesta || respuesta.toLowerCase() === 'seleccione') respuesta = 'No especificado';
+                    } else {
+                        respuesta = String(control.value || '').trim() || 'No especificado';
+                    }
+
+                    const valorPDF = document.createElement('div');
+                    valorPDF.className = 'respuesta-pdf';
+                    valorPDF.textContent = respuesta;
+                    valorPDF.style.cssText = `
+                        display:block; width:100%; min-height:${control.tagName === 'TEXTAREA' ? '90px' : '42px'};
+                        padding:12px; border:1px solid #d4dce7; border-radius:7px;
+                        background:#ffffff; color:#263445; font-family:Arial,Helvetica,sans-serif;
+                        font-size:14px; line-height:1.45; white-space:pre-wrap;
+                        overflow-wrap:anywhere; box-sizing:border-box;
+                    `;
+                    control.replaceWith(valorPDF);
+                });
+
+                // El botón interactivo no forma parte del documento que recibirá la empresa.
+                const botonPDF = formPDF.querySelector('button[type="submit"]');
+                if (botonPDF) botonPDF.remove();
+
+                // El documento mantiene el formulario original y muestra las respuestas
+                // exactamente debajo de sus respectivas preguntas y etiquetas.
+                const nombreCliente = (formulario.querySelector('#nombre').value || 'Cliente')
+                    .trim().replace(/[^a-z0-9áéíóúñ_-]/gi, '_');
+                const nombreArchivo = `Smart_Visa_Evaluacion_${nombreCliente}.pdf`;
+                const opcionesPDF = {
+                    margin: [8, 8, 8, 8],
+                    filename: nombreArchivo,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 1000 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'], avoid: ['.campo', '.fila', 'h2', '.consentimiento'] }
+                };
+
+                const archivoPDF = await html2pdf()
+                    .set(opcionesPDF)
+                    .from(formularioClonado)
+                    .outputPdf('blob');
+
+                areaPDF.remove();
+                areaPDF = null;
+
+                const archivo = new File([archivoPDF], nombreArchivo, { type: 'application/pdf' });
+                const mensajeWhatsApp = 'Hola Smart Visa HN, adjunto mi formulario de evaluación de perfil en formato PDF.';
+                const numeroWhatsApp = '50431512768';
+                const enlaceWhatsApp = 'https://wa.me/' + numeroWhatsApp + '?text=' + encodeURIComponent(mensajeWhatsApp);
+
+                // En dispositivos compatibles permite compartir el PDF como archivo y elegir WhatsApp.
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [archivo] })) {
+                    await navigator.share({
+                        files: [archivo],
+                        title: 'Evaluación de perfil - Smart Visa HN',
+                        text: mensajeWhatsApp
+                    });
+                } else {
+                    // En navegadores sin compartir archivos, descarga el PDF y abre el chat empresarial.
+                    const urlPDF = URL.createObjectURL(archivo);
+                    const enlaceDescarga = document.createElement('a');
+                    enlaceDescarga.href = urlPDF;
+                    enlaceDescarga.download = nombreArchivo;
+                    document.body.appendChild(enlaceDescarga);
+                    enlaceDescarga.click();
+                    enlaceDescarga.remove();
+                    setTimeout(() => URL.revokeObjectURL(urlPDF), 60000);
+                    window.location.href = enlaceWhatsApp;
+                    alert('El PDF con el formulario y las respuestas se descargó. Adjunte ese archivo en el chat de Smart Visa HN para enviarlo.');
+                }
+            } catch (error) {
+                console.error('Error al generar o compartir el PDF:', error);
+                if (areaPDF) areaPDF.remove();
+                alert('No se pudo completar el PDF o compartirlo. Inténtelo nuevamente.');
+            } finally {
+                if (boton) {
+                    boton.disabled = false;
+                    boton.textContent = textoOriginal;
+                }
+            }
+        }
+
+</script>
+</body>
+</html>
