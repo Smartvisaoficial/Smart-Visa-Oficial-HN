@@ -1148,7 +1148,7 @@
       font-size: 14px;
       font-weight: 700;
     }
-    #page-evaluacion input, #page-evaluacion select, #page-evaluacion textarea {
+    #page-evaluacion input, #page-evaluacion select, #page-evaluacion #page-evaluacion textarea {
       display: block;
       width: 100%;
       padding: 12px;
@@ -1204,7 +1204,7 @@
       font-size: 12px;
     }
     /* Campo anti-spam: no modificar */
-    #page-evaluacion .campo-oculto { display: none !important; }
+    #page-evaluacion #page-evaluacion .campo-oculto { display: none !important; }
     @media (max-width: 620px) {
       #page-evaluacion { padding: 12px 8px; }
       #page-evaluacion .contenedor { padding: 22px 17px; }
@@ -1379,11 +1379,7 @@
 <input name="Consentimiento" required="" type="checkbox" value="Aceptado"/>
 <span>Autorizo a Smart Visa HN a utilizar la información proporcionada para contactarme y brindarme asesoría sobre los servicios solicitados. *</span>
 </label>
-<p class="privacidad">
-        No incluya números de pasaporte, contraseñas, datos bancarios ni documentos sensibles en este formulario.
-        La información debe manejarse conforme a la política de privacidad de la empresa y con acceso restringido.
-      </p>
-<button type="submit">ENVIAR PERFIL POR WHATSAPP</button>
+<button type="submit">ENVIAR PERFIL DE EVALUACION</button>
 </form>
 <div class="pie">Smart Visa HN · Conectando vidas</div>
 </main>
@@ -1758,134 +1754,163 @@
                 formulario.reportValidity();
                 return;
             }
+
             const honeypot = formulario.querySelector('[name="_honey"]');
             if (honeypot && honeypot.value.trim() !== '') return;
 
-            const boton = formulario.querySelector('button[type="submit"]');
-            const textoOriginal = boton ? boton.textContent : '';
-            if (boton) {
-                boton.disabled = true;
-                boton.textContent = 'GENERANDO PDF...';
+            if (typeof html2pdf === 'undefined') {
+                alert('No se pudo cargar el generador de PDF. Verifique su conexión e inténtelo nuevamente.');
+                return;
             }
 
-            let areaPDF;
-            try {
-                if (typeof html2pdf === 'undefined') {
-                    throw new Error('No se pudo cargar el generador de PDF.');
-                }
+            const boton = formulario.querySelector('button[type="submit"]');
+            const textoOriginal = boton.textContent;
+            boton.disabled = true;
+            boton.textContent = 'GENERANDO PDF...';
 
-                // Clona el formulario original para conservar su estructura, logo,
-                // títulos, secciones, colores, bordes y distribución visual.
-                const paginaOriginal = document.querySelector('#page-evaluacion .contenedor');
-                areaPDF = document.createElement('div');
-                areaPDF.id = 'page-evaluacion';
-                areaPDF.style.cssText = `
-                    display:block !important; position:absolute; left:0; top:0;
-                    width:940px; padding:20px; margin:0; background:#ffffff;
-                    z-index:-1; opacity:1; pointer-events:none;
+            try {
+                const datos = new FormData(formulario);
+                const logoOriginal = document.querySelector('#page-evaluacion .logo');
+                const contenidoPDF = document.createElement('div');
+
+                contenidoPDF.style.cssText = `
+                    width: 794px; padding: 42px 48px; background: #ffffff;
+                    color: #263445; font-family: Arial, Helvetica, sans-serif;
+                    box-sizing: border-box; font-size: 12px; line-height: 1.45;
                 `;
 
-                const formularioClonado = paginaOriginal.cloneNode(true);
-                formularioClonado.style.cssText += ';display:block;width:900px;max-width:none;margin:0 auto;box-shadow:none;';
-                areaPDF.appendChild(formularioClonado);
-                document.body.appendChild(areaPDF);
+                const encabezadoPDF = document.createElement('div');
+                encabezadoPDF.style.cssText = `
+                    display:flex; align-items:center; justify-content:space-between;
+                    gap:24px; border-bottom:5px solid #0750ad;
+                    padding-bottom:18px; margin-bottom:22px;
+                `;
 
-                const formPDF = formularioClonado.querySelector('#formulario-cliente-smartvisa');
+                const bloqueMarca = document.createElement('div');
+                const tituloMarca = document.createElement('h1');
+                tituloMarca.textContent = 'SMART VISA HN';
+                tituloMarca.style.cssText = 'margin:0 0 5px;color:#123c70;font-size:28px;font-weight:800;letter-spacing:1px;';
+                const subtituloMarca = document.createElement('p');
+                subtituloMarca.textContent = 'Formulario de Registro y Perfil del Cliente';
+                subtituloMarca.style.cssText = 'margin:0;color:#667386;font-size:13px;';
+                bloqueMarca.append(tituloMarca, subtituloMarca);
 
-                // CLAVE: copiar los valores del formulario REAL al clon.
-                // cloneNode() no conserva de forma fiable los valores escritos,
-                // selecciones ni casillas marcadas por el cliente.
-                const controlesOriginales = formulario.querySelectorAll('input, select, textarea');
-                const controlesClonados = formPDF.querySelectorAll('input, select, textarea');
+                if (logoOriginal && logoOriginal.src) {
+                    const logoPDF = document.createElement('img');
+                    logoPDF.src = logoOriginal.src;
+                    logoPDF.alt = 'Logo Smart Visa HN';
+                    logoPDF.style.cssText = 'width:115px;height:95px;object-fit:contain;';
+                    encabezadoPDF.append(bloqueMarca, logoPDF);
+                } else {
+                    encabezadoPDF.append(bloqueMarca);
+                }
+                contenidoPDF.appendChild(encabezadoPDF);
 
-                controlesOriginales.forEach((original, indice) => {
-                    const copia = controlesClonados[indice];
-                    if (!copia) return;
+                const fechaPDF = document.createElement('p');
+                fechaPDF.textContent = 'Fecha de registro: ' + new Date().toLocaleDateString('es-HN');
+                fechaPDF.style.cssText = 'text-align:right;color:#718096;font-size:10px;margin:0 0 18px;';
+                contenidoPDF.appendChild(fechaPDF);
 
-                    if (original.type === 'checkbox' || original.type === 'radio') {
-                        copia.checked = original.checked;
-                    } else if (original.tagName === 'SELECT') {
-                        copia.selectedIndex = original.selectedIndex;
-                        Array.from(copia.options).forEach((opcion, i) => {
-                            opcion.selected = original.options[i]?.selected || false;
+                const notaPDF = document.createElement('div');
+                notaPDF.textContent = 'Información proporcionada por el cliente para la evaluación inicial de su perfil migratorio.';
+                notaPDF.style.cssText = 'padding:11px 14px;background:#eef5ff;border-left:4px solid #0750ad;margin-bottom:20px;color:#263445;';
+                contenidoPDF.appendChild(notaPDF);
+
+                let seccionActual = null;
+                const campos = Array.from(formulario.children);
+
+                campos.forEach(elemento => {
+                    if (elemento.tagName === 'H2') {
+                        seccionActual = document.createElement('section');
+                        seccionActual.style.cssText = 'margin:18px 0 14px;page-break-inside:avoid;';
+                        const titulo = document.createElement('h2');
+                        titulo.textContent = elemento.textContent.trim();
+                        titulo.style.cssText = 'font-size:15px;color:#123c70;border-bottom:2px solid #dce6f2;padding-bottom:7px;margin:0 0 12px;';
+                        seccionActual.appendChild(titulo);
+                        contenidoPDF.appendChild(seccionActual);
+                        return;
+                    }
+
+                    if (elemento.classList.contains('campo') || elemento.classList.contains('fila')) {
+                        const camposElemento = elemento.classList.contains('campo')
+                            ? [elemento]
+                            : Array.from(elemento.querySelectorAll('.campo'));
+
+                        camposElemento.forEach(campo => {
+                            const control = campo.querySelector('input, select, textarea');
+                            const etiqueta = campo.querySelector('label');
+                            if (!control || !etiqueta || control.name === '_honey' || control.type === 'checkbox') return;
+
+                            let valor = String(control.value || '').trim();
+                            if (!valor) valor = 'No especificado';
+
+                            const filaPDF = document.createElement('div');
+                            filaPDF.style.cssText = 'display:flex;gap:12px;padding:7px 2px;border-bottom:1px solid #edf0f4;page-break-inside:avoid;';
+                            const nombrePDF = document.createElement('strong');
+                            nombrePDF.textContent = etiqueta.textContent.replace('*', '').trim() + ':';
+                            nombrePDF.style.cssText = 'width:38%;flex-shrink:0;color:#123c70;';
+                            const valorPDF = document.createElement('span');
+                            valorPDF.textContent = valor;
+                            valorPDF.style.cssText = 'flex:1;white-space:pre-wrap;overflow-wrap:anywhere;';
+                            filaPDF.append(nombrePDF, valorPDF);
+                            (seccionActual || contenidoPDF).appendChild(filaPDF);
                         });
-                    } else {
-                        copia.value = original.value;
-                        copia.setAttribute('value', original.value);
-                        if (original.tagName === 'TEXTAREA') copia.textContent = original.value;
-                    }
-                });
-
-                // Sustituye cada control por la respuesta del cliente, dentro del
-                // mismo espacio del campo, conservando etiquetas, secciones y diseño.
-                formPDF.querySelectorAll('input, select, textarea').forEach(control => {
-                    if (control.name === '_honey' || control.classList.contains('campo-oculto')) {
-                        control.remove();
                         return;
                     }
 
-                    if (control.type === 'checkbox') {
-                        const marca = document.createElement('span');
-                        marca.textContent = control.checked ? '☑' : '☐';
-                        marca.style.cssText = 'display:inline-block;font-size:17px;color:#0750ad;min-width:20px;';
-                        control.replaceWith(marca);
+                    if (elemento.classList.contains('consentimiento')) {
+                        const filaConsentimiento = document.createElement('div');
+                        filaConsentimiento.style.cssText = 'margin-top:18px;padding:12px;background:#f4f7fb;border-radius:6px;page-break-inside:avoid;';
+                        const textoConsentimiento = document.createElement('p');
+                        textoConsentimiento.textContent = elemento.innerText.trim() + ' — ' +
+                            (formulario.querySelector('[name="Consentimiento"]').checked ? 'ACEPTADO' : 'NO ACEPTADO');
+                        textoConsentimiento.style.cssText = 'margin:0;color:#263445;font-size:10px;';
+                        filaConsentimiento.appendChild(textoConsentimiento);
+                        contenidoPDF.appendChild(filaConsentimiento);
                         return;
                     }
 
-                    let respuesta = '';
-                    if (control.tagName === 'SELECT') {
-                        respuesta = control.selectedIndex >= 0
-                            ? control.options[control.selectedIndex].text.trim() : '';
-                        if (!respuesta || respuesta.toLowerCase() === 'seleccione') respuesta = 'No especificado';
-                    } else {
-                        respuesta = String(control.value || '').trim() || 'No especificado';
+                    if (elemento.classList.contains('privacidad')) {
+                        const privacidadPDF = document.createElement('p');
+                        privacidadPDF.textContent = elemento.textContent.trim();
+                        privacidadPDF.style.cssText = 'margin-top:12px;color:#687587;font-size:9px;';
+                        contenidoPDF.appendChild(privacidadPDF);
                     }
-
-                    const valorPDF = document.createElement('div');
-                    valorPDF.className = 'respuesta-pdf';
-                    valorPDF.textContent = respuesta;
-                    valorPDF.style.cssText = `
-                        display:block; width:100%; min-height:${control.tagName === 'TEXTAREA' ? '90px' : '42px'};
-                        padding:12px; border:1px solid #d4dce7; border-radius:7px;
-                        background:#ffffff; color:#263445; font-family:Arial,Helvetica,sans-serif;
-                        font-size:14px; line-height:1.45; white-space:pre-wrap;
-                        overflow-wrap:anywhere; box-sizing:border-box;
-                    `;
-                    control.replaceWith(valorPDF);
                 });
 
-                // El botón interactivo no forma parte del documento que recibirá la empresa.
-                const botonPDF = formPDF.querySelector('button[type="submit"]');
-                if (botonPDF) botonPDF.remove();
+                const piePDF = document.createElement('div');
+                piePDF.textContent = 'SMART VISA HN · Conectando vidas';
+                piePDF.style.cssText = 'margin-top:26px;padding-top:12px;border-top:2px solid #0750ad;text-align:center;color:#123c70;font-weight:bold;font-size:11px;';
+                contenidoPDF.appendChild(piePDF);
 
-                // El documento mantiene el formulario original y muestra las respuestas
-                // exactamente debajo de sus respectivas preguntas y etiquetas.
+                document.body.appendChild(contenidoPDF);
+
                 const nombreCliente = (formulario.querySelector('#nombre').value || 'Cliente')
                     .trim().replace(/[^a-z0-9áéíóúñ_-]/gi, '_');
                 const nombreArchivo = `Smart_Visa_Evaluacion_${nombreCliente}.pdf`;
                 const opcionesPDF = {
-                    margin: [8, 8, 8, 8],
+                    margin: [10, 8, 10, 8],
                     filename: nombreArchivo,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 1000 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['css', 'legacy'], avoid: ['.campo', '.fila', 'h2', '.consentimiento'] }
+                    pagebreak: { mode: ['css', 'legacy'] }
                 };
 
                 const archivoPDF = await html2pdf()
                     .set(opcionesPDF)
-                    .from(formularioClonado)
+                    .from(contenidoPDF)
                     .outputPdf('blob');
 
-                areaPDF.remove();
-                areaPDF = null;
+                document.body.removeChild(contenidoPDF);
 
                 const archivo = new File([archivoPDF], nombreArchivo, { type: 'application/pdf' });
                 const mensajeWhatsApp = 'Hola Smart Visa HN, adjunto mi formulario de evaluación de perfil en formato PDF.';
                 const numeroWhatsApp = '50431512768';
-                const enlaceWhatsApp = 'https://wa.me/' + numeroWhatsApp + '?text=' + encodeURIComponent(mensajeWhatsApp);
+                const enlaceWhatsApp = 'https://wa.me/' + numeroWhatsApp + '?text=' +
+                    encodeURIComponent(mensajeWhatsApp);
 
-                // En dispositivos compatibles permite compartir el PDF como archivo y elegir WhatsApp.
+                // En móviles compatibles, abre el menú para compartir el PDF y elegir WhatsApp.
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [archivo] })) {
                     await navigator.share({
                         files: [archivo],
@@ -1893,7 +1918,8 @@
                         text: mensajeWhatsApp
                     });
                 } else {
-                    // En navegadores sin compartir archivos, descarga el PDF y abre el chat empresarial.
+                    // En equipos que no permiten adjuntar archivos desde el navegador:
+                    // descarga el PDF y abre WhatsApp para que el usuario lo adjunte al chat.
                     const urlPDF = URL.createObjectURL(archivo);
                     const enlaceDescarga = document.createElement('a');
                     enlaceDescarga.href = urlPDF;
@@ -1903,17 +1929,14 @@
                     enlaceDescarga.remove();
                     setTimeout(() => URL.revokeObjectURL(urlPDF), 60000);
                     window.location.href = enlaceWhatsApp;
-                    alert('El PDF con el formulario y las respuestas se descargó. Adjunte ese archivo en el chat de Smart Visa HN para enviarlo.');
+                    alert('El PDF se descargó. En WhatsApp, adjunte el archivo PDF descargado para enviarlo a Smart Visa HN.');
                 }
             } catch (error) {
                 console.error('Error al generar o compartir el PDF:', error);
-                if (areaPDF) areaPDF.remove();
                 alert('No se pudo completar el PDF o compartirlo. Inténtelo nuevamente.');
             } finally {
-                if (boton) {
-                    boton.disabled = false;
-                    boton.textContent = textoOriginal;
-                }
+                boton.disabled = false;
+                boton.textContent = textoOriginal;
             }
         }
 
